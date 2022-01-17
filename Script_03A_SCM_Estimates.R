@@ -4,6 +4,7 @@
 # Bruno Ponne 
 
 library(dplyr)
+library(ggplot2)
 library(Synth)
 library(kableExtra)
 library(xtable)

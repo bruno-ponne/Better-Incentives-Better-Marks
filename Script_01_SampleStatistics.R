@@ -6,7 +6,8 @@
 
 #Libraries needed for this script:
   
-library(tidyverse)
+library(dplyr)
+library(tidyr)
 library(table1)
 
 # Loading data:

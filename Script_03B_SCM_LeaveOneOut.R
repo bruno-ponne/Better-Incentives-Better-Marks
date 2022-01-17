@@ -4,7 +4,9 @@
 # Bruno Ponne 
 
 library(dplyr)
+library(ggplot2)
 library(Synth)
+library(tidyr)
 
 load("data/DATA_COMPLETE.RData")
 
