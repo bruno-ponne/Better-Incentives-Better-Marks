@@ -8,7 +8,7 @@ library(ggplot2)
 library(Synth)
 library(kableExtra)
 library(xtable)
-library(gridExtra)
+library(ggpubr)
 
 
 source("functions/plot_scm.R")
@@ -85,17 +85,19 @@ DATA_GRAPH$grade <- factor(DATA_GRAPH$grade, levels = c("Primary Education", "Lo
 DATA_GRAPH$subject[DATA_GRAPH$subject=="math"] <- "Mathematics"
 DATA_GRAPH$subject[DATA_GRAPH$subject=="port"] <- "Portuguese"
 
-# Figure 06:
+# Figure 06a (SCM - Primary Education)
 
-ggplot(data = DATA_GRAPH, aes(x=year, y= score, color = unit))+
+a_06 <- ggplot(data = filter(DATA_GRAPH, grade == "Primary Education"), aes(x=year, y= score, color = unit))+
   geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_line(size=0.9)+
   scale_color_manual(values= c("#01665e","#d8b365"), 
                      labels= c( "Ceará", "Synthetic Ceará"), 
                      name = "")+
   ylab("Score")+
-  xlab("Year")+
-  annotate("text", x = 2013, y = 159, label = "Policy Change", color = "#636363", size = 4)+
+  xlab("")+
+  annotate("text", x = 2007, y = 220, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2013, y = 152, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -106,9 +108,39 @@ ggplot(data = DATA_GRAPH, aes(x=year, y= score, color = unit))+
         panel.spacing = unit(1.1, "lines"),
         strip.background = element_rect(fill="white", linetype = "blank"),
         text = element_text(family="Helvetica", color ="#636363"))+
-  facet_grid(vars(grade), vars(subject))
+  facet_grid(vars(grade),vars(subject))
 
-ggsave(filename = "figure06.png", path = "plots",   width = 19, height = 15, , units = "cm")
+
+# Figure 06b (SCM - Lower Secondary Education)
+
+b_06 <- ggplot(data = filter(DATA_GRAPH, grade == "Lower Secondary Education"), aes(x=year, y= score, color = unit))+
+  geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2015, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_line(size=0.9)+
+  scale_color_manual(values= c("#01665e","#d8b365"), 
+                     labels= c( "Ceará", "Synthetic Ceará"), 
+                     name = "")+
+  ylab("Score")+
+  xlab("Year")+
+  annotate("text", x = 2007, y = 250, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = 190, label = "TI + TA", color = "#636363", size = 4)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  facet_grid(vars(grade),vars(subject))
+
+
+ggarrange(a_06, b_06, ncol = 1, nrow = 2, common.legend = TRUE, legend = "bottom")
+
+ggsave(filename = "figure06.png", path = "plots",   width = 21, height = 15, , units = "cm")
+
 
 DATA_GAP <- rbind(PM_GAP, PP_GAP, LSM_GAP, LSP_GAP)
 
@@ -119,15 +151,17 @@ DATA_GAP$grade <- factor(DATA_GAP$grade, levels = c("Primary Education", "Lower 
 DATA_GAP$subject[DATA_GAP$subject=="math"] <- "Mathematics"
 DATA_GAP$subject[DATA_GAP$subject=="port"] <- "Portuguese"
 
-# Figure 07:
+# Figure 07a (Primary)
 
-ggplot(data = DATA_GAP, aes(x=year, y=gap))+
+a_07 <- ggplot(data = filter(DATA_GAP, grade == "Primary Education"), aes(x=year, y=gap))+
   geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_hline(yintercept = 0, color = "lightgray", size = 0.5)+
   geom_line(size=0.9, color = "#01665e")+
   ylab("Effect")+
-  xlab("Year")+
-  annotate("text", x = 2013, y = 35, label = "Policy Change", color = "#636363", size = 4)+
+  xlab("")+
+  annotate("text", x = 2007, y = 20, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2013, y = -20, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -141,12 +175,53 @@ ggplot(data = DATA_GAP, aes(x=year, y=gap))+
   ylim(-40,40)+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure07.png", path = "plots", width = 19, height = 15, , units = "cm")
+# Figure 07b (Lower Secondary Education)
+
+b_07 <- ggplot(data = filter(DATA_GAP, grade == "Lower Secondary Education"), aes(x=year, y=gap))+
+  geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2015, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_hline(yintercept = 0, color = "lightgray", size = 0.5)+
+  geom_line(size=0.9, color = "#01665e")+
+  ylab("Effect")+
+  xlab("Year")+
+  annotate("text", x = 2007, y = 20, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = -20, label = "TI + TA", color = "#636363", size = 4)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  ylim(-40,40)+
+  facet_grid(vars(grade), vars(subject))
+
+ggarrange(a_07, b_07, ncol = 1, nrow = 2)
+
+
+ggsave(filename = "figure07.png", path = "plots", width = 21, height = 15, , units = "cm")
 
 # Average Effects:
 
+# Primary (TI, TI+TA) 
+
 DATA_GAP %>% 
-  filter(year>2008) %>% 
+  filter(year>2010, grade == "Primary Education") %>% 
+  group_by(subject, grade) %>%
+  summarise(mean(gap))
+
+#Lower Secondary (TI, TI+TA)
+
+DATA_GAP %>% 
+  filter(year>2007 & year<2015, grade == "Lower Secondary Education") %>% 
+  group_by(subject, grade) %>%
+  summarise(mean(gap))
+
+DATA_GAP %>% 
+  filter(year>=2015, grade == "Lower Secondary Education") %>% 
   group_by(subject, grade) %>%
   summarise(mean(gap))
   
@@ -182,6 +257,7 @@ GRAPH_US$grade <- "Upper Secondary Education"
 
 ggplot(data = GRAPH_US, aes(x=year, y= score, color = unit))+
   geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2019, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_line(size=0.9)+
   scale_color_manual(values= c("#01665e","#d8b365"), 
                      labels= c( "Ceará", "Synthetic Ceará"), 
@@ -189,7 +265,8 @@ ggplot(data = GRAPH_US, aes(x=year, y= score, color = unit))+
   ylab("Score")+
   xlab("Year")+
   ylim(220,310)+
-  annotate("text", x = 2015.5, y = 230, label = "Policy Change", color = "#636363", size = 4)+
+  annotate("text", x = 2010, y = 300, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = 230, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -202,7 +279,7 @@ ggplot(data = GRAPH_US, aes(x=year, y= score, color = unit))+
         text = element_text(family="Helvetica", color ="#636363"))+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure08.png", path = "plots", width = 19, height = 8, , units = "cm")
+ggsave(filename = "figure08.png", path = "plots", width = 21, height = 8, , units = "cm")
 
 DATA_GAP_US <- rbind(USM_GAP,USP_GAP)
 
@@ -214,11 +291,13 @@ DATA_GAP_US$grade <- "Upper Secondary Education"
 
 ggplot(data = DATA_GAP_US, aes(x=year, y=gap))+
   geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2019, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_hline(yintercept = 0, color = "lightgray", size = 0.5)+
   geom_line(size=0.9, color = "#01665e")+
   ylab("Effect")+
   xlab("Year")+
-  annotate("text", x = 2015.5, y = 35, label = "Policy Change", color = "#636363", size = 4)+
+  annotate("text", x = 2010, y = 20, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = -20, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -232,7 +311,7 @@ ggplot(data = DATA_GAP_US, aes(x=year, y=gap))+
   ylim(-40,40)+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure09.png", path = "plots", width = 19, height = 8, units = "cm")
+ggsave(filename = "figure09.png", path = "plots", width = 21, height = 8, units = "cm")
 
 
 
@@ -330,7 +409,7 @@ print(xtable(PRED_PRI, include.rownames=TRUE), type="html", file="table05.html")
 ## in-time placebo test ##
 ##########################
 
-# Figure 12 (atificial intervention in 2003)
+# Figure 10 (artificial intervention starting in 1999)
 
 # Preparing data with Synth:
 DATA_PM_P <- prepare_time_placebo(PRIMARY_M)
@@ -379,15 +458,19 @@ DATA_GRAPH$grade <- factor(DATA_GRAPH$grade, levels = c("Primary Education", "Lo
 DATA_GRAPH$subject[DATA_GRAPH$subject=="math"] <- "Mathematics"
 DATA_GRAPH$subject[DATA_GRAPH$subject=="port"] <- "Portuguese"
 
-ggplot(data = DATA_GRAPH, aes(x=year, y= score, color = unit))+
-  geom_vline(xintercept = 2003, color = "#636363", linetype = "dashed", size = 0.9)+
+# Figure 10a
+
+a_10 <- ggplot(data = filter(DATA_GRAPH, grade == "Primary Education"), aes(x=year, y= score, color = unit))+
+  geom_vline(xintercept = 1999, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2002, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_line(size=0.9)+
   scale_color_manual(values= c("#01665e","#d8b365"), 
                      labels= c( "Ceará", "Synthetic Ceará"), 
                      name = "")+
   ylab("Score")+
-  xlab("Year")+
-  annotate("text", x = 2009, y = 260, label = "Placebo Policy Change", color = "#636363", size = 3)+
+  xlab("")+
+  annotate("text", x = 1996.2, y = 210, label = "Placebo TI", color = "#636363", size = 3)+
+  annotate("text", x = 2005, y = 140, label = "Placebo TI+TA", color = "#636363", size = 3)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -400,7 +483,33 @@ ggplot(data = DATA_GRAPH, aes(x=year, y= score, color = unit))+
         text = element_text(family="Helvetica", color ="#636363"))+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure10.png", path = "plots", width = 19, height = 15, , units = "cm")
+b_10 <- ggplot(data = filter(DATA_GRAPH, grade == "Lower Secondary Education"), aes(x=year, y= score, color = unit))+
+  geom_vline(xintercept = 1999, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2006, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_line(size=0.9)+
+  scale_color_manual(values= c("#01665e","#d8b365"), 
+                     labels= c( "Ceará", "Synthetic Ceará"), 
+                     name = "")+
+  ylab("Score")+
+  xlab("Year")+
+  annotate("text", x = 1996.2, y = 210, label = "Placebo TI", color = "#636363", size = 3)+
+  annotate("text", x = 2009, y = 140, label = "Placebo TI+TA", color = "#636363", size = 3)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  facet_grid(vars(grade), vars(subject))
+
+ggarrange(a_10, b_10, ncol = 1, nrow = 2, common.legend = TRUE, legend = "bottom")
+
+
+ggsave(filename = "figure10.png", path = "plots", width = 21, height = 15, , units = "cm")
 
 
 

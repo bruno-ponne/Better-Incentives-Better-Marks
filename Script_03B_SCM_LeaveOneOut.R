@@ -7,6 +7,8 @@ library(dplyr)
 library(ggplot2)
 library(Synth)
 library(tidyr)
+library(ggpubr)
+
 
 load("data/DATA_COMPLETE.RData")
 
@@ -43,8 +45,8 @@ for (i in leave_out) {
                              unit.names.variable = "abbr_state",
                              treatment.identifier  = 23,
                              controls.identifier   = states_one_out,
-                             time.predictors.prior = seq(1995, 2007, 2),
-                             time.optimize.ssr     = seq(1995, 2007, 2),
+                             time.predictors.prior = seq(1995, 2008, 2),
+                             time.optimize.ssr     = seq(1995, 2008, 2),
                              time.plot             = seq(1995, 2019, 2))
     
   results[[as.character(i)]] <- dataprep.out
@@ -88,8 +90,8 @@ for (i in leave_out) {
                            unit.names.variable = "abbr_state",
                            treatment.identifier  = 23,
                            controls.identifier   = states_one_out,
-                           time.predictors.prior = seq(1995, 2007, 2),
-                           time.optimize.ssr     = seq(1995, 2007, 2),
+                           time.predictors.prior = seq(1995, 2008, 2),
+                           time.optimize.ssr     = seq(1995, 2008, 2),
                            time.plot             = seq(1995, 2019, 2))
   
   results[[as.character(i)]] <- dataprep.out
@@ -133,8 +135,8 @@ for (i in leave_out) {
                            unit.names.variable = "abbr_state",
                            treatment.identifier  = 23,
                            controls.identifier   = states_one_out,
-                           time.predictors.prior = seq(1995, 2007, 2),
-                           time.optimize.ssr     = seq(1995, 2007, 2),
+                           time.predictors.prior = seq(1995, 2008, 2),
+                           time.optimize.ssr     = seq(1995, 2008, 2),
                            time.plot             = seq(1995, 2019, 2))
   
   results[[as.character(i)]] <- dataprep.out
@@ -178,8 +180,8 @@ for (i in leave_out) {
                            unit.names.variable = "abbr_state",
                            treatment.identifier  = 23,
                            controls.identifier   = states_one_out,
-                           time.predictors.prior = seq(1995, 2007, 2),
-                           time.optimize.ssr     = seq(1995, 2007, 2),
+                           time.predictors.prior = seq(1995, 2008, 2),
+                           time.optimize.ssr     = seq(1995, 2008, 2),
                            time.plot             = seq(1995, 2019, 2))
   
   results[[as.character(i)]] <- dataprep.out
@@ -220,15 +222,18 @@ PLOT_DATA$subject[PLOT_DATA$subject == "Math"] <- "Mathematics"
 PLOT_DATA$grade <- factor(PLOT_DATA$grade, levels = c("Primary Education","Lower Secondary Education"))
 
 
-ggplot(data = PLOT_DATA, aes(x = year, y = score, color = color, group = unit))+
+# Plot 11a
+a_11 <- ggplot(data = filter(PLOT_DATA, grade == "Primary Education"), aes(x = year, y = score, color = color, group = unit))+
   geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_line(size=0.7)+
   scale_color_manual(values= c("gray","#d8b365","#01665e"), 
                      labels= c( "Synthetic Ceará (leave-one-out)", "Synthetic Ceará","Ceará"), 
                      name = "")+
   ylab("Score")+
   xlab("Year")+
-  annotate("text", x = 2013, y = 159, label = "Policy Change", color = "#636363", size = 4)+
+  annotate("text", x = 2007, y = 220, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2013, y = 152, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -241,6 +246,33 @@ ggplot(data = PLOT_DATA, aes(x = year, y = score, color = color, group = unit))+
         text = element_text(family="Helvetica", color ="#636363"))+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure11.png", path = "plots", width = 19, height = 15, , units = "cm")
+# Plot 11b
+
+b_11 <- ggplot(data = filter(PLOT_DATA, grade == "Lower Secondary Education"), aes(x = year, y = score, color = color, group = unit))+
+  geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2015, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_line(size=0.7)+
+  scale_color_manual(values= c("gray","#d8b365","#01665e"), 
+                     labels= c( "Synthetic Ceará (leave-one-out)", "Synthetic Ceará","Ceará"), 
+                     name = "")+
+  ylab("Score")+
+  xlab("Year")+
+  annotate("text", x = 2007, y = 250, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = 190, label = "TI + TA", color = "#636363", size = 4)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  facet_grid(vars(grade), vars(subject))
+
+ggarrange(a_11, b_11, ncol = 1, nrow = 2, common.legend = TRUE, legend = "bottom")
+
+ggsave(filename = "figure11.png", path = "plots", width = 21, height = 15, , units = "cm")
 
 

@@ -25,8 +25,8 @@ permutate_p_ls <- function(data){
                              unit.names.variable = "abbr_state",
                              treatment.identifier  = i,
                              controls.identifier   = states[which(states!=i)],
-                             time.predictors.prior = seq(1995, 2007, 2),
-                             time.optimize.ssr     = seq(1995, 2007, 2),
+                             time.predictors.prior = seq(1995, 2008, 2),
+                             time.optimize.ssr     = seq(1995, 2008, 2),
                              time.plot             = seq(1995, 2019, 2))
     
     results[[as.character(i)]] <- dataprep.out

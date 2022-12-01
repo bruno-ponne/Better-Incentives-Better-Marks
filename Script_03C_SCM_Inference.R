@@ -6,6 +6,7 @@
 
 library(Synth)
 library(dplyr)
+library(ggpubr)
 
 source("functions/permutate_p_ls.R")
 source("functions/permutate_us.R")
@@ -61,18 +62,19 @@ GAP_P_LS$grade <- if_else(GAP_P_LS$grade == "Primary School", "Primary Education
 
 GAP_P_LS$grade <- factor(GAP_P_LS$grade, levels = c("Primary Education", "Lower Secondary Education"))
 
-
-ggplot()+
+a_12 <- ggplot()+
   geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_hline(yintercept = 0, size = 0.7, color = "#636363")+
-  geom_line(data = filter(GAP_P_LS, code_state != "X23"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
-  geom_line(data = filter(GAP_P_LS, code_state == "X23"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
+  geom_line(data = filter(GAP_P_LS, code_state != "X23", grade == "Primary Education"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
+  geom_line(data = filter(GAP_P_LS, code_state == "X23", grade == "Primary Education"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
   scale_color_manual(name='',
                      breaks=c('Control States', 'Ceará'),
                      values=c('Control States'='gray', "Ceará" = "#01665e"))+
-  ylab("Score Gap")+
+  ylab("Effect")+
   xlab("Year")+
-  annotate("text", x = 2013, y = -35, label = "Policy Change", color = "#636363", size = 4)+
+  annotate("text", x = 2007, y = 35, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2013, y = -35, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -86,7 +88,36 @@ ggplot()+
   ylim(-40,40)+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure12.png", path = "plots", width = 19, height = 15, , units = "cm")
+b_12 <- ggplot()+
+  geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2015, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_hline(yintercept = 0, size = 0.7, color = "#636363")+
+  geom_line(data = filter(GAP_P_LS, code_state != "X23", grade == "Lower Secondary Education"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
+  geom_line(data = filter(GAP_P_LS, code_state == "X23", grade == "Lower Secondary Education"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
+  scale_color_manual(name='',
+                     breaks=c('Control States', 'Ceará'),
+                     values=c('Control States'='gray', "Ceará" = "#01665e"))+
+  ylab("Effect")+
+  xlab("Year")+
+  annotate("text", x = 2007, y = 35, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = -35, label = "TI + TA", color = "#636363", size = 4)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  ylim(-40,40)+
+  facet_grid(vars(grade), vars(subject))
+
+ggarrange(a_12, b_12, ncol = 1, nrow = 2, common.legend = TRUE, legend = "bottom")
+
+
+ggsave(filename = "figure12.png", path = "plots", width = 21, height = 15, , units = "cm")
 
 
 # Preintervention mean squared prediction error (MSPE)
@@ -121,19 +152,22 @@ MSPE_LS_P <- PLOT_MSPE %>%
 GAP_P_LS_2x <- rbind(MSPE_PRIMARY_M, MSPE_PRIMARY_P, MSPE_LS_M, MSPE_LS_P)
 
 # Figure 13:
-
 # Permutation Graphs ONLY with states whose pre-intervention MSPE was lower than 2x pre-intervention MSPE Ceará
-ggplot()+
+
+
+a_13 <- ggplot()+
   geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2011, color = "#636363", linetype = "dashed", size = 0.9)+
   geom_hline(yintercept = 0, size = 0.7, color = "#636363")+
-  geom_line(data = filter(GAP_P_LS_2x, code_state != "X23"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
-  geom_line(data = filter(GAP_P_LS_2x, code_state == "X23"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
+  geom_line(data = filter(GAP_P_LS_2x, code_state != "X23", grade == "Primary Education"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
+  geom_line(data = filter(GAP_P_LS_2x, code_state == "X23", grade == "Primary Education"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
   scale_color_manual(name='',
                      breaks=c('Control States', 'Ceará'),
                      values=c('Control States'='gray', "Ceará" = "#01665e"))+
-  ylab("Score Gap")+
+  ylab("Effect")+
   xlab("Year")+
-  annotate("text", x = 2013, y = -35, label = "Policy Change", color = "#636363", size = 4)+
+  annotate("text", x = 2007, y = 35, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2013, y = -35, label = "TI + TA", color = "#636363", size = 4)+
   theme_bw()+
   theme(panel.grid.major = element_blank(), 
         panel.grid.minor = element_blank(),
@@ -147,7 +181,39 @@ ggplot()+
   ylim(-40,40)+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure13.png", path = "plots", width = 19, height = 15, , units = "cm")
+b_13 <- ggplot()+
+  geom_vline(xintercept = 2008, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_vline(xintercept = 2015, color = "#636363", linetype = "dashed", size = 0.9)+
+  geom_hline(yintercept = 0, size = 0.7, color = "#636363")+
+  geom_line(data = filter(GAP_P_LS_2x, code_state != "X23", grade == "Lower Secondary Education"), aes(x=year, y= gap, group = code_state, color = "Control States"),size=0.5)+
+  geom_line(data = filter(GAP_P_LS_2x, code_state == "X23", grade == "Lower Secondary Education"), aes(x=year, y= gap, color = "Ceará"), size=1.0)+
+  scale_color_manual(name='',
+                     breaks=c('Control States', 'Ceará'),
+                     values=c('Control States'='gray', "Ceará" = "#01665e"))+
+  ylab("Effect")+
+  xlab("Year")+
+  annotate("text", x = 2007, y = 35, label = "TI", color = "#636363", size = 4)+
+  annotate("text", x = 2017, y = -35, label = "TI + TA", color = "#636363", size = 4)+
+  theme_bw()+
+  theme(panel.grid.major = element_blank(), 
+        panel.grid.minor = element_blank(),
+        strip.text = element_text(colour = "#636363"),
+        axis.line = element_line(colour = "gray"),
+        panel.border = element_rect(colour = "gray"),
+        legend.position = "bottom",
+        panel.spacing = unit(1.1, "lines"),
+        strip.background = element_rect(fill="white", linetype = "blank"),
+        text = element_text(family="Helvetica", color ="#636363"))+
+  ylim(-40,40)+
+  facet_grid(vars(grade), vars(subject))
+
+ggarrange(a_13, b_13, ncol = 1, nrow = 2, common.legend = TRUE, legend = "bottom")
+
+
+ggsave(filename = "figure13.png", path = "plots", width = 21, height = 15, , units = "cm")
+
+
+
 
 
 
@@ -196,7 +262,7 @@ ggplot(data = POST_PRE, aes(x= RATIO, color = isCE, fill = isCE))+
         text = element_text(family="Helvetica", color ="#636363"))+
   facet_grid(vars(grade), vars(subject))
 
-ggsave(filename = "figure14.png", path = "plots", width = 19, height = 15, , units = "cm")
+ggsave(filename = "figure14.png", path = "plots", width = 21, height = 15, , units = "cm")
 
 
 

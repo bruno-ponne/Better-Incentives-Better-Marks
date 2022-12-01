@@ -16,8 +16,8 @@ prepare_time_placebo <- function(data){
                       unit.names.variable = "abbr_state",
                       treatment.identifier  = 23,
                       controls.identifier   = c(11:17, 21:22, 24:29, 31:33, 35, 41:43, 50:53),
-                      time.predictors.prior = seq(1995, 2003, 2),
-                      time.optimize.ssr     = seq(1995, 2003, 2),
+                      time.predictors.prior = seq(1995, 1999, 2),
+                      time.optimize.ssr     = seq(1995, 1999, 2),
                       time.plot             = seq(1995, 2019, 2))
  
   return(DATA_PM)
